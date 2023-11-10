@@ -13,6 +13,5 @@ namespace ADBFinal.DataAccessLayer.DatabaseConnect
             var userCollection = connector.GetCollection<User>("Users");
             return userCollection;
         }
-
     }
 }

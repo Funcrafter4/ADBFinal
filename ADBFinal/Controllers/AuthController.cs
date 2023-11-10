@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using MongoDB.Driver;
 using ADBFinal.DataAccessLayer.DatabaseConnect;
+using ADBFinal.DataAccessLayer.DTO;
 
 namespace ADBFinal.Controllers
 {
@@ -19,7 +20,7 @@ namespace ADBFinal.Controllers
             _configuration = configuration;
         }
         
-        [HttpPost("register")]
+        [HttpPost("Register")]
         public async Task<ActionResult<User>> Register(String UserEmail, String UserPassword, String UserName)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -28,8 +29,11 @@ namespace ADBFinal.Controllers
             var dbuser = userCollection.Find(filter).FirstOrDefault();
            if (dbuser == null)
             {
+                var filterCount = Builders<User>.Filter.Exists(u => u.UserId);
+                var userCount = DatabaseConnect.UserCollection().CountDocuments(filterCount);
+                int userNumber = Convert.ToInt32(userCount + 1);
                 CreatePasswordHash(UserPassword, out byte[] UserPasswordHash, out byte[] UserPasswordSalt);
-                dbuser = new User(UserName, UserEmail, UserPasswordHash, UserPasswordSalt);
+                dbuser = new User(userNumber, UserName, UserEmail, UserPasswordHash, UserPasswordSalt);
                 userCollection.InsertOne(dbuser);
                 return Ok("New User Inserted");
             } 
@@ -58,6 +62,51 @@ namespace ADBFinal.Controllers
             return Ok(token);
 
         }
+
+        [HttpGet("GetId")]
+        public async Task<ActionResult<int>> GetId(String JWT)
+        {
+            string jwt = JWT;
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(jwt);
+            var tokenS = jsonToken as JwtSecurityToken;
+            var jti = tokenS.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+            int userid = int.Parse(jti);
+
+            return Ok(userid);
+        }
+
+
+        [HttpGet("GetUser")]
+
+        public async Task<ActionResult<string>> GetUser(int UserId)
+        {
+            var userCollection = DatabaseConnect.UserCollection();
+
+            var filter = Builders<User>.Filter.Eq(u => u.UserId, UserId);
+            var dbuser = userCollection.Find(filter).FirstOrDefault();
+            var userDTO = new UserDTO(dbuser.UserId, dbuser.UserName, dbuser.UserEmail, dbuser.UserHistory, dbuser.UserWishlist, dbuser.UserCart);
+
+            return Ok(userDTO);
+        }
+
+        [HttpPost("DeleteUser")]
+        public async Task<ActionResult<string>> DeleteUser(int UserId)
+        {
+            var userCollection = DatabaseConnect.UserCollection();
+
+            var filter = Builders<User>.Filter.Eq(u => u.UserId, UserId);
+            var dbuser = userCollection.Find(filter).FirstOrDefault();
+            if (dbuser != null)
+            {
+                userCollection.DeleteOne(filter);
+                return Ok("User Deleted");
+            }
+
+
+            return BadRequest("User Doesn't Exist");
+        }
+
 
         private string CreateToken(User user)
         {

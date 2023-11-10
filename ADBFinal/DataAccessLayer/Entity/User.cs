@@ -5,8 +5,9 @@ namespace ADBFinal.DataAccessLayer.Entity
 {
     public class User
     {
-        public User(string userName, string userEmail, byte[] userPasswordHash, byte[] userPasswordSalt)
+        public User(int userId,string userName, string userEmail, byte[] userPasswordHash, byte[] userPasswordSalt)
         {
+            UserId = userId;
             UserName = userName;
             UserEmail = userEmail;
             UserPasswordHash = userPasswordHash;
@@ -27,6 +28,12 @@ namespace ADBFinal.DataAccessLayer.Entity
         public byte[] UserPasswordHash { get; set; }
 
         public byte[] UserPasswordSalt { get; set; }
+
+        public int[] UserHistory {  get; set; }
+
+        public int[] UserWishlist { get; set; }
+
+        public int[] UserCart { get; set; }
 
     }
 }
