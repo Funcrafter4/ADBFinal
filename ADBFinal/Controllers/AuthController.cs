@@ -87,8 +87,8 @@ namespace ADBFinal.Controllers
             var dbuser = userCollection.Find(filter).FirstOrDefault();
             if (dbuser != null)
             {
-                var userDTO = new UserDTO(dbuser.UserId, dbuser.UserName, dbuser.UserEmail, dbuser.UserHistory, dbuser.UserWishlist, dbuser.UserCart);
-
+                var userDTO = new UserDTO(dbuser.UserId, dbuser.UserName, dbuser.UserEmail, dbuser.UserHistory, dbuser.UserWishlist, dbuser.UserCart); 
+                
                 return Ok(userDTO);
             }
             return NotFound("User Doesn't Exist");

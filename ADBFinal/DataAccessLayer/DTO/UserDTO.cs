@@ -2,7 +2,7 @@
 {
     public class UserDTO
     {
-        public UserDTO(int userId, string userName, string userEmail, int[] userHistory, int[] userWishlist, int[] userCart)
+        public UserDTO(int userId, string userName, string userEmail, List<int> userHistory, List<int> userWishlist, List<int> userCart)
         {
             UserId = userId;
             UserName = userName;
@@ -18,10 +18,10 @@
 
         public string UserEmail { get; set; }
 
-        public int[] UserHistory { get; set; }
+        public List<int> UserHistory { get; set; } = new List<int>();
 
-        public int[] UserWishlist { get; set; }
+        public List<int> UserWishlist { get; set; } = new List<int>();
 
-        public int[] UserCart { get; set; }
+        public List<int> UserCart { get; set; } = new List<int>();
     }
 }

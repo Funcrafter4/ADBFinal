@@ -29,11 +29,11 @@ namespace ADBFinal.DataAccessLayer.Entity
 
         public byte[] UserPasswordSalt { get; set; }
 
-        public int[] UserHistory {  get; set; }
+        public List<int> UserHistory {  get; set; } = new List<int>();
 
-        public int[] UserWishlist { get; set; }
+        public List<int> UserWishlist { get; set; } = new List<int>();
 
-        public int[] UserCart { get; set; }
+        public List<int> UserCart { get; set; } = new List<int>();
 
     }
 }
