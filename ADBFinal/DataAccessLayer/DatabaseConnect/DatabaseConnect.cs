@@ -20,5 +20,12 @@ namespace ADBFinal.DataAccessLayer.DatabaseConnect
             var productCollection = connector.GetCollection<Product>("Products");
             return productCollection;
         }
+
+        public static IMongoCollection<Category> CategoryCollection()
+        {
+            var connector = new MongoDBHelper("mongodb+srv://Admin:ytP5DHSV5N4T1Kcw@adbfinal.wv3trmy.mongodb.net/", "MegaMart");
+            var categoryCollection = connector.GetCollection<Category>("Categories");
+            return categoryCollection;
+        }
     }
 }

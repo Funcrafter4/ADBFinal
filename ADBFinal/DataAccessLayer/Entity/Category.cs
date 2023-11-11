@@ -5,8 +5,9 @@ namespace ADBFinal.DataAccessLayer.Entity
 {
     public class Category
     {
-        public Category(string categoryName, string categoryDescription)
+        public Category(int categoryId, string categoryName, string categoryDescription)
         {
+            CategoryId = categoryId;
             CategoryName = categoryName;
             CategoryDescription = categoryDescription;
 
