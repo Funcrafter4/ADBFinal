@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver.Core.Configuration;
-using ADBFinal.DataAccessLayer.Entity;
+﻿using ADBFinal.DataAccessLayer.Entity;
 using MongoDB.Driver;
 
 namespace ADBFinal.DataAccessLayer.DatabaseConnect

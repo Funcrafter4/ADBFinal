@@ -1,7 +1,6 @@
 ﻿using ADBFinal.DataAccessLayer.DatabaseConnect;
 using ADBFinal.DataAccessLayer.Entity;
 using ADBFinal.DataAccessLayer.HttpRequests;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 

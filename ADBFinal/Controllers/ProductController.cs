@@ -3,10 +3,7 @@ using ADBFinal.DataAccessLayer.Entity;
 using ADBFinal.DataAccessLayer.HttpRequests;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace ADBFinal.Controllers
 {
