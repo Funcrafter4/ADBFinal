@@ -1,13 +1,22 @@
-﻿namespace ADBFinal.DataAccessLayer.Entity
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
+namespace ADBFinal.DataAccessLayer.Entity
 {
     public class Product
     {
-        public Product(string productName, string productDescription, int productCategoryID)
+        public Product(int productId,string productName, string productDescription, int productCategoryID, int productPrice)
         {
+            ProductId = productId;
             ProductName = productName;
             ProductDescription = productDescription;
             ProductCategoryID = productCategoryID;
+            ProductPrice = productPrice;
         }
+
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string _id { get; set; }
 
         public int ProductId { get; set; }
 
@@ -18,6 +27,8 @@
         public string ProductDescription {  get; set; }
 
         public int ProductCategoryID { get; set; }
+
+        public int ProductPrice { get; set; }
 
 
     }

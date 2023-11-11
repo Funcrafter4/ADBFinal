@@ -7,7 +7,7 @@ using System.Security.Claims;
 using MongoDB.Driver;
 using ADBFinal.DataAccessLayer.DatabaseConnect;
 using ADBFinal.DataAccessLayer.DTO;
-
+using ADBFinal.DataAccessLayer.HttpRequests;
 namespace ADBFinal.Controllers
 {
     [ApiController]
@@ -21,38 +21,39 @@ namespace ADBFinal.Controllers
         }
         
         [HttpPost("Register")]
-        public async Task<ActionResult<User>> Register(String UserEmail, String UserPassword, String UserName)
+        public Task<ActionResult<User>> Register(RegisterRequest myJsonResponse)
         {
+
             var userCollection = DatabaseConnect.UserCollection();
 
-            var filter = Builders<User>.Filter.Eq(u => u.UserEmail, UserEmail);
+            var filter = Builders<User>.Filter.Eq(u => u.UserEmail, myJsonResponse.UserEmail);
             var dbuser = userCollection.Find(filter).FirstOrDefault();
            if (dbuser == null)
             {
                 var filterCount = Builders<User>.Filter.Exists(u => u.UserId);
                 var userCount = DatabaseConnect.UserCollection().CountDocuments(filterCount);
                 int userNumber = Convert.ToInt32(userCount + 1);
-                CreatePasswordHash(UserPassword, out byte[] UserPasswordHash, out byte[] UserPasswordSalt);
-                dbuser = new User(userNumber, UserName, UserEmail, UserPasswordHash, UserPasswordSalt);
+                CreatePasswordHash(myJsonResponse.UserPassword, out byte[] UserPasswordHash, out byte[] UserPasswordSalt);
+                dbuser = new User(userNumber, myJsonResponse.UserName, myJsonResponse.UserEmail, UserPasswordHash, UserPasswordSalt);
                 userCollection.InsertOne(dbuser);
-                return Ok("New User Inserted");
+                return Task.FromResult<ActionResult<User>>(Ok("New User Inserted"));
             } 
-            return BadRequest("User Exists");
+            return Task.FromResult<ActionResult<User>>(NotFound("User Exists"));
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<string>> Login(String UserEmail, String UserPassword)
+        public async Task<ActionResult<string>> Login(LoginRequest myJsonRespone)
         {
             var userCollection = DatabaseConnect.UserCollection();
-            var filter = Builders<User>.Filter.Eq(u => u.UserEmail, UserEmail);
+            var filter = Builders<User>.Filter.Eq(u => u.UserEmail, myJsonRespone.UserEmail);
             var dbuser = userCollection.Find(filter).FirstOrDefault();
 
             if (dbuser == null)
             {
-                return BadRequest("User not found");
+                return NotFound("User not found");
             }
 
-            if (!VerifyPasswordHash(UserPassword, dbuser.UserPasswordHash, dbuser.UserPasswordSalt))
+            if (!VerifyPasswordHash(myJsonRespone.UserPassword, dbuser.UserPasswordHash, dbuser.UserPasswordSalt))
             {
                 return BadRequest("Wrong Password");
             }
@@ -64,7 +65,7 @@ namespace ADBFinal.Controllers
         }
 
         [HttpGet("GetId")]
-        public async Task<ActionResult<int>> GetId(String JWT)
+        public async Task<ActionResult<int>> GetId(string JWT)
         {
             string jwt = JWT;
             var handler = new JwtSecurityTokenHandler();
@@ -82,12 +83,15 @@ namespace ADBFinal.Controllers
         public async Task<ActionResult<string>> GetUser(int UserId)
         {
             var userCollection = DatabaseConnect.UserCollection();
-
             var filter = Builders<User>.Filter.Eq(u => u.UserId, UserId);
             var dbuser = userCollection.Find(filter).FirstOrDefault();
-            var userDTO = new UserDTO(dbuser.UserId, dbuser.UserName, dbuser.UserEmail, dbuser.UserHistory, dbuser.UserWishlist, dbuser.UserCart);
+            if (dbuser != null)
+            {
+                var userDTO = new UserDTO(dbuser.UserId, dbuser.UserName, dbuser.UserEmail, dbuser.UserHistory, dbuser.UserWishlist, dbuser.UserCart);
 
-            return Ok(userDTO);
+                return Ok(userDTO);
+            }
+            return NotFound("User Doesn't Exist");
         }
 
         [HttpPost("DeleteUser")]
@@ -104,7 +108,7 @@ namespace ADBFinal.Controllers
             }
 
 
-            return BadRequest("User Doesn't Exist");
+            return NotFound("User Doesn't Exist");
         }
 
 

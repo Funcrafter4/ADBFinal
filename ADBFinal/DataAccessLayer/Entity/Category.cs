@@ -1,4 +1,7 @@
-﻿namespace ADBFinal.DataAccessLayer.Entity
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
+namespace ADBFinal.DataAccessLayer.Entity
 {
     public class Category
     {
@@ -8,6 +11,10 @@
             CategoryDescription = categoryDescription;
 
         }
+
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string _id { get; set; }
 
         public int CategoryId { get; set; }
 
