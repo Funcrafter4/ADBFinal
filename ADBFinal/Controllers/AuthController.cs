@@ -112,7 +112,7 @@ namespace ADBFinal.Controllers
         }
 
         [HttpPut("Admin_Create_Admin")]
-        public async Task<ActionResult<string>> AdminCreateAdmin(CreateAdmin myJsonResponse)
+        public async Task<ActionResult<string>> AdminCreateAdmin(CreateAdminRequest myJsonResponse)
         {
             var userCollection = DatabaseConnect.UserCollection();
 
