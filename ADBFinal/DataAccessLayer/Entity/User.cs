@@ -35,5 +35,7 @@ namespace ADBFinal.DataAccessLayer.Entity
 
         public List<int> UserCart { get; set; } = new List<int>();
 
+        public bool IsAdmin { get; set; }
+
     }
 }

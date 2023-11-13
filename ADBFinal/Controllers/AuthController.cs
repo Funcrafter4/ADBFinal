@@ -111,6 +111,36 @@ namespace ADBFinal.Controllers
             return NotFound("User Doesn't Exist");
         }
 
+        [HttpPut("Admin_Create_Admin")]
+        public async Task<ActionResult<string>> AdminCreateAdmin(CreateAdmin myJsonResponse)
+        {
+            var userCollection = DatabaseConnect.UserCollection();
+
+            var isadminfilter = Builders<User>.Filter.Eq(u => u.UserId, myJsonResponse.AdminId);
+            var dbadmin = userCollection.Find(isadminfilter).FirstOrDefault();
+            if (dbadmin.IsAdmin)
+            {
+                var filter = Builders<User>.Filter.Eq(u => u.UserId, myJsonResponse.NewAdminId);
+                var dbuser = userCollection.Find(filter).FirstOrDefault();
+                if(dbuser != null)
+                {
+                    var update = Builders<User>.Update.Set(u => u.IsAdmin, true);
+                    var updateResult = await userCollection.UpdateOneAsync(filter, update);
+                    if (updateResult.ModifiedCount > 0)
+                    {
+                        return Ok("User promoted to admin successfully");
+                    }
+                    else
+                    {
+                        return BadRequest("Failed to update user");
+                    }
+                }
+                return NotFound("User to promote doesn't exist");
+
+            }
+            return Unauthorized("Only admins can create admins");
+        }
+
 
         private string CreateToken(User user)
         {
