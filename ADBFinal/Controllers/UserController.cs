@@ -187,5 +187,55 @@ namespace ADBFinal.Controllers
 
             return NotFound("User Doesn't Exist");
         }
+
+        [HttpGet("Get_Recomendations_based_on_History")]
+        public async Task<ActionResult<List<Product>>> GetRecomendations(int UserId)
+        {
+            var userCollection = DatabaseConnect.UserCollection();
+            var filter = Builders<User>.Filter.Eq(u => u.UserId, UserId);
+            var dbuser = await userCollection.Find(filter).FirstOrDefaultAsync();
+
+            if (dbuser != null)
+            {
+                List<int> userhistory = dbuser.UserHistory;
+                if (!userhistory.IsNullOrEmpty())
+                {
+                    var productCollection = DatabaseConnect.ProductCollection();
+
+                    // Step 1: Get ProductCategoryId from user history
+                    var productFilter = Builders<Product>.Filter.In(p => p.ProductId, userhistory);
+                    var products = await productCollection.Find(productFilter).ToListAsync();
+                    var categoryIds = products.Select(p => p.ProductCategoryID).Distinct().ToList();
+
+                    if (categoryIds.IsNullOrEmpty())
+                    {
+                        return NotFound("No Items in History");
+                    }
+
+                    // Step 2: Get 5 random products with the same category
+                    var random = new Random();
+                    var recommendedProducts = new List<Product>();
+
+                    foreach (var categoryId in categoryIds)
+                    {
+                        var categoryFilter = Builders<Product>.Filter.Eq(p => p.ProductCategoryID, categoryId);
+                        var categoryProducts = await productCollection.Find(categoryFilter).ToListAsync();
+
+                        if (categoryProducts.Count > 0)
+                        {
+                            var randomProducts = categoryProducts.OrderBy(_ => random.Next()).Take(5);
+                            recommendedProducts.AddRange(randomProducts);
+                        }
+                    }
+                    var finalRecommendations = recommendedProducts.OrderBy(_ => random.Next()).Take(5).ToList();
+
+                    return Ok(finalRecommendations);
+                }
+
+                return NotFound("No Items in History");
+            }
+
+            return NotFound("User Doesn't Exist");
+        }
     }
 }
