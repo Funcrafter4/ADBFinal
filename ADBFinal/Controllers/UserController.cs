@@ -8,6 +8,8 @@ using MongoDB.Driver;
 
 namespace ADBFinal.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class UserController : Controller
     {
 
@@ -23,7 +25,7 @@ namespace ADBFinal.Controllers
                 userCollection.UpdateOne(filter, update);
                 return Ok("Product Added to Wishlist");
             }
-                return NotFound("User Doesn't Exist");
+            return NotFound("User Doesn't Exist");
         }
 
         [HttpPut("Add_to_Users_History")]
@@ -71,7 +73,7 @@ namespace ADBFinal.Controllers
                     var update = Builders<User>.Update.Pull(u => u.UserWishlist, myJsonResponse.ProductId);
                     userCollection.UpdateOne(filter, update);
                     return Ok("Product Deleted from Wishlist");
-                }               
+                }
                 return NotFound("No such item in wishlist");
             }
             return NotFound("User Doesn't Exist");
@@ -237,5 +239,58 @@ namespace ADBFinal.Controllers
 
             return NotFound("User Doesn't Exist");
         }
+
+        /*[HttpGet("Get_Users_Likes")]
+        public async Task<ActionResult<List<int>>> GetUsersLikes(int UserId)
+        {
+            var userCollection = DatabaseConnect.UserCollection();
+            var filter = Builders<User>.Filter.Eq(u => u.UserId, UserId);
+            var dbuser = await userCollection.Find(filter).FirstOrDefaultAsync();
+
+            if (dbuser != null)
+            {
+                List<int> userwishlist = dbuser.UserWishlist;
+                if (!userwishlist.IsNullOrEmpty())
+                {
+                    var productCollection = DatabaseConnect.ProductCollection();
+
+                    // Step 1: Get ProductCategoryId from user wishlist
+                    var productFilter = Builders<Product>.Filter.In(p => p.ProductId, userwishlist);
+                    var products = await productCollection.Find(productFilter).ToListAsync();
+                    var categoryIds = products.Select(p => p.ProductCategoryID).Distinct().ToList();
+
+                    if (categoryIds.IsNullOrEmpty())
+                    {
+                        return NotFound("No Items in Wishlist");
+                    }
+
+                    // Step 2: Find wishlists of other users where UserId isn't the initial UserId
+                    // and the wishlists contain any of the categoryIds
+                    var otherUsersWishlistFilter = Builders<User>.Filter
+                        .Ne(u => u.UserId, UserId) // Exclude the current user
+                        & Builders<User>.Filter.AnyIn(u => u.UserWishlist, categoryIds);
+
+                    var otherUsersWishlist = await userCollection.Find(otherUsersWishlistFilter).ToListAsync();
+
+                    // Step 3: Get the distinct numbers from wishlists of other users
+                    var numbersFromOtherUsersWishlist = otherUsersWishlist
+                        .SelectMany(u => u.UserWishlist)
+                        .Distinct()
+                        .ToList();
+
+                    return Ok(numbersFromOtherUsersWishlist);
+
+                }
+                else
+                {
+                    return NotFound("No Items in Wishlist");
+                }
+
+
+            }
+
+            return NotFound("User Doesn't Exist");
+        }*/
+
     }
 }
