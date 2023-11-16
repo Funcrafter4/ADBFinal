@@ -5,10 +5,11 @@ namespace ADBFinal.DataAccessLayer.Entity
 {
     public class Product
     {
-        public Product(int productId,string productName, string productDescription, int productCategoryID, int productPrice)
+        public Product(int productId,string productName, string productImage, string productDescription, int productCategoryID, int productPrice)
         {
             ProductId = productId;
             ProductName = productName;
+            ProductImage = productImage;
             ProductDescription = productDescription;
             ProductCategoryID = productCategoryID;
             ProductPrice = productPrice;
