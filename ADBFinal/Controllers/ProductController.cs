@@ -85,7 +85,7 @@ namespace ADBFinal.Controllers
             var filterCount = Builders<Product>.Filter.Exists(p => p.ProductId);
             var productCount = DatabaseConnect.ProductCollection().CountDocuments(filterCount);
             int productNumber = Convert.ToInt32(productCount + 1); 
-            var product = new Product(productNumber, myJsonResponse.ProductName,myJsonResponse.ProductDescription,myJsonResponse.ProductCategoryId,myJsonResponse.ProductPrice);
+            var product = new Product(productNumber, myJsonResponse.ProductName, myJsonResponse.ProductImage, myJsonResponse.ProductDescription, myJsonResponse.ProductCategoryId, myJsonResponse.ProductPrice);
             productCollection.InsertOne(product);
 
             return Ok("New Product Insterted");

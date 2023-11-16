@@ -23,14 +23,12 @@ namespace ADBFinal.DataAccessLayer.Entity
 
         public string ProductName { get; set; }
 
-        public string ProductImage {  get; set; }
-
+        public string ProductImage { get; set; }
         public string ProductDescription {  get; set; }
 
         public int ProductCategoryID { get; set; }
 
         public int ProductPrice { get; set; }
-
 
     }
 }
