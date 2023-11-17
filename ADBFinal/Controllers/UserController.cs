@@ -240,7 +240,7 @@ namespace ADBFinal.Controllers
             return NotFound("User Doesn't Exist");
         }
 
-        /*[HttpGet("Get_Users_Likes")]
+        [HttpGet("Get_Users_Likes")]
         public async Task<ActionResult<List<int>>> GetUsersLikes(int UserId)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -252,33 +252,36 @@ namespace ADBFinal.Controllers
                 List<int> userwishlist = dbuser.UserWishlist;
                 if (!userwishlist.IsNullOrEmpty())
                 {
+                    // Find other users with wishlists containing at least one common product ID
+                    var filterOtherUsers = Builders<User>.Filter.And(
+                        Builders<User>.Filter.Ne(u => u.UserId, UserId), // Exclude the current user
+                        Builders<User>.Filter.AnyIn(u => u.UserWishlist, userwishlist) // Wishlist contains at least one common product ID
+                    );
+
+                    var otherUsers = await userCollection.Find(filterOtherUsers).ToListAsync();
+
+                    // Extract the wishlists from other users
+                    List<List<int>> otherWishlists = otherUsers.Select(u => u.UserWishlist).ToList();
+
+                    // Exclude product IDs of the initial user from the combined product IDs of other users' wishlists
+                    List<int> otherUserProductIds = otherWishlists.SelectMany(ids => ids).Except(userwishlist).ToList();
+
                     var productCollection = DatabaseConnect.ProductCollection();
 
-                    // Step 1: Get ProductCategoryId from user wishlist
-                    var productFilter = Builders<Product>.Filter.In(p => p.ProductId, userwishlist);
+                    var productFilter = Builders<Product>.Filter.In(p => p.ProductId, otherUserProductIds);
                     var products = await productCollection.Find(productFilter).ToListAsync();
-                    var categoryIds = products.Select(p => p.ProductCategoryID).Distinct().ToList();
 
-                    if (categoryIds.IsNullOrEmpty())
+                    var random = new Random();
+                    var userlikesProducts = products.OrderBy(_ => random.Next()).Take(5).ToList();
+
+                    if (!userlikesProducts.IsNullOrEmpty())
                     {
-                        return NotFound("No Items in Wishlist");
+                        return Ok(userlikesProducts);
                     }
-
-                    // Step 2: Find wishlists of other users where UserId isn't the initial UserId
-                    // and the wishlists contain any of the categoryIds
-                    var otherUsersWishlistFilter = Builders<User>.Filter
-                        .Ne(u => u.UserId, UserId) // Exclude the current user
-                        & Builders<User>.Filter.AnyIn(u => u.UserWishlist, categoryIds);
-
-                    var otherUsersWishlist = await userCollection.Find(otherUsersWishlistFilter).ToListAsync();
-
-                    // Step 3: Get the distinct numbers from wishlists of other users
-                    var numbersFromOtherUsersWishlist = otherUsersWishlist
-                        .SelectMany(u => u.UserWishlist)
-                        .Distinct()
-                        .ToList();
-
-                    return Ok(numbersFromOtherUsersWishlist);
+                    else
+                    {
+                        return BadRequest("No other products found");
+                    }
 
                 }
                 else
@@ -290,7 +293,7 @@ namespace ADBFinal.Controllers
             }
 
             return NotFound("User Doesn't Exist");
-        }*/
+        }
 
     }
 }
