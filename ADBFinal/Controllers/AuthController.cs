@@ -8,6 +8,8 @@ using MongoDB.Driver;
 using ADBFinal.DataAccessLayer.DatabaseConnect;
 using ADBFinal.DataAccessLayer.DTO;
 using ADBFinal.DataAccessLayer.HttpRequests;
+using System.Text.RegularExpressions;
+
 namespace ADBFinal.Controllers
 {
     [ApiController]
@@ -23,7 +25,8 @@ namespace ADBFinal.Controllers
         [HttpPost("Register")]
         public Task<ActionResult<User>> Register(RegisterRequest myJsonResponse)
         {
-
+            bool validpass = false;
+            bool validemail = false;
             var userCollection = DatabaseConnect.UserCollection();
 
             var filter = Builders<User>.Filter.Eq(u => u.UserEmail, myJsonResponse.UserEmail);
@@ -33,10 +36,33 @@ namespace ADBFinal.Controllers
                 var filterCount = Builders<User>.Filter.Exists(u => u.UserId);
                 var userCount = DatabaseConnect.UserCollection().CountDocuments(filterCount);
                 int userNumber = Convert.ToInt32(userCount + 1);
-                CreatePasswordHash(myJsonResponse.UserPassword, out byte[] UserPasswordHash, out byte[] UserPasswordSalt);
-                dbuser = new User(userNumber, myJsonResponse.UserName, myJsonResponse.UserEmail, UserPasswordHash, UserPasswordSalt);
-                userCollection.InsertOne(dbuser);
-                return Task.FromResult<ActionResult<User>>(Ok("New User Inserted"));
+                if (IsPasswordValid(myJsonResponse.UserPassword))
+                {
+                    validpass = true;
+
+                }
+                else
+                {
+                    return Task.FromResult < ActionResult < User >>  (BadRequest("Password must contain 8 symbols"));
+                }
+                if (IsValidEmail(myJsonResponse.UserEmail))
+                {
+                    validemail = true;
+                }
+                else
+                {
+                    return Task.FromResult<ActionResult<User>>(BadRequest("Write valid email"));
+                }
+                if (validemail && validpass) {
+                    CreatePasswordHash(myJsonResponse.UserPassword, out byte[] UserPasswordHash, out byte[] UserPasswordSalt);
+                    dbuser = new User(userNumber, myJsonResponse.UserName, myJsonResponse.UserEmail, UserPasswordHash, UserPasswordSalt);
+                    userCollection.InsertOne(dbuser);
+                    return Task.FromResult<ActionResult<User>>(Ok("New User Inserted"));
+                }
+                else
+                {
+                    return Task.FromResult<ActionResult<User>>(BadRequest("Password or Email is not valid"));
+                }
             } 
             return Task.FromResult<ActionResult<User>>(NotFound("User Exists"));
         }
@@ -184,7 +210,21 @@ namespace ADBFinal.Controllers
             }
         }
 
+        static bool IsPasswordValid(string password)
+        {
+            // Check if the password has at least 8 characters
+            return password.Length >= 8;
+        }
 
+        static bool IsValidEmail(string email)
+        {
+            // Define a regular expression for a simple email validation
+            string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$";
+
+            Regex regex = new Regex(pattern);
+
+            return regex.IsMatch(email);
+        }
 
     }
 }
