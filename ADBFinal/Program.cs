@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRouting();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
 
 var app = builder.Build();
 app.MapControllers();
@@ -25,7 +27,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
 void ConfigureServices(IServiceCollection services)
 {
     services.AddControllers();
