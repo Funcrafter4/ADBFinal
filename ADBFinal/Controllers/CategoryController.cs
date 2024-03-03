@@ -28,7 +28,7 @@ namespace ADBFinal.Controllers
             var dbcategory = categoryCollection.Find(filter).FirstOrDefault();
             if (dbcategory == null)
             {
-                return NotFound("Category Not Found");
+                return BadRequest("Category Not Found");
             }
 
             return Ok(dbcategory);
@@ -48,7 +48,7 @@ namespace ADBFinal.Controllers
         }
 
 
-        [HttpGet("Delete_Category")]
+        [HttpDelete("Delete_Category")]
         public async Task<IActionResult> DeleteCategory(int CategoryId)
         {
             var categoryCollection = DatabaseConnect.CategoryCollection();
@@ -60,7 +60,7 @@ namespace ADBFinal.Controllers
                 return Ok("Category Deleted");
             }
 
-            return NotFound("Category Not Found");
+            return BadRequest("Category Not Found");
         }
     }
 }

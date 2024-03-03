@@ -99,13 +99,13 @@ namespace ADBFinal.Controllers
             var dbproduct = productCollection.Find(filter).FirstOrDefault();
             if (dbproduct == null)
             {
-                return NotFound("Product Not Found");
+                return BadRequest("Product Not Found");
             }
 
             return Ok(dbproduct);
         }
 
-        [HttpGet("Delete_Product")]
+        [HttpDelete("Delete_Product")]
         public async Task<IActionResult> DeleteProduct(int ProductId)
         {
             var productCollection = DatabaseConnect.ProductCollection();
@@ -117,7 +117,7 @@ namespace ADBFinal.Controllers
                 return Ok("Product Deleted");
             }
 
-            return NotFound("Product Not Found");
+            return BadRequest("Product Not Found");
         }
     }
 }

@@ -13,7 +13,7 @@ namespace ADBFinal.Controllers
     public class UserController : Controller
     {
 
-        [HttpPut("Add_to_Users_Wishlist")]
+        [HttpPatch("Add_to_Users_Wishlist")]
         public async Task<ActionResult<string>> AddWishlistItem(AddDeleteArrayRequest myJsonResponse)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -25,10 +25,10 @@ namespace ADBFinal.Controllers
                 userCollection.UpdateOne(filter, update);
                 return Ok("Product Added to Wishlist");
             }
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");  
         }
 
-        [HttpPut("Add_to_Users_History")]
+        [HttpPatch("Add_to_Users_History")]
         public async Task<ActionResult<string>> AddItemToHistory(AddDeleteArrayRequest myJsonResponse)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -40,10 +40,10 @@ namespace ADBFinal.Controllers
                 userCollection.UpdateOne(filter, update);
                 return Ok("Updated User History");
             }
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
-        [HttpPut("Add_to_Users_Cart")]
+        [HttpPatch("Add_to_Users_Cart")]
         public async Task<ActionResult<string>> AddCartItem(AddDeleteArrayRequest myJsonResponse)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -55,10 +55,10 @@ namespace ADBFinal.Controllers
                 userCollection.UpdateOne(filter, update);
                 return Ok("Product Added to Cart");
             }
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
-        [HttpPut("Delete_from_Users_Wishlist")]
+        [HttpDelete("Delete_from_Users_Wishlist")]
         public async Task<ActionResult<string>> DeleteWishlistItem(AddDeleteArrayRequest myJsonResponse)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -74,12 +74,12 @@ namespace ADBFinal.Controllers
                     userCollection.UpdateOne(filter, update);
                     return Ok("Product Deleted from Wishlist");
                 }
-                return NotFound("No such item in wishlist");
+                return BadRequest("No such item in wishlist");
             }
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
-        [HttpPut("Delete_from_Users_Cart")]
+        [HttpDelete("Delete_from_Users_Cart")]
         public async Task<ActionResult<string>> DeleteCartItem(AddDeleteArrayRequest myJsonResponse)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -95,12 +95,12 @@ namespace ADBFinal.Controllers
                     userCollection.UpdateOne(filter, update);
                     return Ok("Product Deleted from Cart");
                 }
-                return NotFound("No such item in Cart");
+                return BadRequest("No such item in Cart");
             }
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
-        [HttpPut("Delete_from_Users_History")]
+        [HttpDelete("Delete_from_Users_History")]
         public async Task<ActionResult<string>> DeleteHistoryItem(AddDeleteArrayRequest myJsonResponse)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -116,9 +116,9 @@ namespace ADBFinal.Controllers
                     userCollection.UpdateOne(filter, update);
                     return Ok("Product Deleted from History");
                 }
-                return NotFound("No such item in History");
+                return BadRequest("No such item in History");
             }
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
         [HttpGet("Get_Products_from_Wishlist")]
@@ -138,10 +138,10 @@ namespace ADBFinal.Controllers
                     var products = await productCollection.Find(productFilter).ToListAsync();
                     return Ok(products);
                 }
-                return NotFound("No Items in wishlist");
+                return BadRequest("No Items in wishlist");
             }
 
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
         [HttpGet("Get_Products_from_Cart")]
@@ -161,10 +161,10 @@ namespace ADBFinal.Controllers
                     var products = await productCollection.Find(productFilter).ToListAsync();
                     return Ok(products);
                 }
-                return NotFound("No Items in cart");
+                return BadRequest("No Items in cart");
             }
 
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
         [HttpGet("Get_Products_from_History")]
@@ -184,10 +184,10 @@ namespace ADBFinal.Controllers
                     var products = await productCollection.Find(productFilter).ToListAsync();
                     return Ok(products);
                 }
-                return NotFound("No Items in History");
+                return BadRequest("No Items in History");
             }
 
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
         [HttpGet("Get_Recomendations_based_on_History")]
@@ -211,7 +211,7 @@ namespace ADBFinal.Controllers
 
                     if (categoryIds.IsNullOrEmpty())
                     {
-                        return NotFound("No Items in History");
+                        return BadRequest("No Items in History");
                     }
 
                     // Step 2: Get 5 random products with the same category
@@ -234,10 +234,10 @@ namespace ADBFinal.Controllers
                     return Ok(finalRecommendations);
                 }
 
-                return NotFound("No Items in History");
+                return BadRequest("No Items in History");
             }
 
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
         [HttpGet("Get_Users_Likes")]
@@ -286,13 +286,13 @@ namespace ADBFinal.Controllers
                 }
                 else
                 {
-                    return NotFound("No Items in Wishlist");
+                    return BadRequest("No Items in Wishlist");
                 }
 
 
             }
 
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
     }

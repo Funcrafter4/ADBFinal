@@ -64,7 +64,7 @@ namespace ADBFinal.Controllers
                     return Task.FromResult<ActionResult<User>>(BadRequest("Password or Email is not valid"));
                 }
             } 
-            return Task.FromResult<ActionResult<User>>(NotFound("User Exists"));
+            return Task.FromResult<ActionResult<User>>(BadRequest("User Exists"));
         }
 
         [HttpPost("Login")]
@@ -76,7 +76,7 @@ namespace ADBFinal.Controllers
 
             if (dbuser == null)
             {
-                return NotFound("User not found");
+                return BadRequest("User not found");
             }
 
             if (!VerifyPasswordHash(myJsonRespone.UserPassword, dbuser.UserPasswordHash, dbuser.UserPasswordSalt))
@@ -117,10 +117,10 @@ namespace ADBFinal.Controllers
                 
                 return Ok(userDTO);
             }
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
-        [HttpPost("DeleteUser")]
+        [HttpDelete("DeleteUser")]
         public async Task<ActionResult<string>> DeleteUser(int UserId)
         {
             var userCollection = DatabaseConnect.UserCollection();
@@ -134,7 +134,7 @@ namespace ADBFinal.Controllers
             }
 
 
-            return NotFound("User Doesn't Exist");
+            return BadRequest("User Doesn't Exist");
         }
 
         [HttpPut("Admin_Create_Admin")]
@@ -161,7 +161,7 @@ namespace ADBFinal.Controllers
                         return BadRequest("Failed to update user");
                     }
                 }
-                return NotFound("User to promote doesn't exist");
+                return BadRequest("User to promote doesn't exist");
 
             }
             return Unauthorized("Only admins can create admins");
